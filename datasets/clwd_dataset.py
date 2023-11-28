@@ -57,6 +57,7 @@ class CLWDDataset(torch.utils.data.Dataset):
     
     def get_sample(self, index):
         img_id = self.ids[index]
+        print(img_id)
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
         img_J = cv2.imread(self.imageJ_path%img_id)
         img_J = cv2.cvtColor(img_J, cv2.COLOR_BGR2RGB)

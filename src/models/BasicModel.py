@@ -12,7 +12,7 @@ import time
 import src.networks as nets
 from math import log10
 import skimage.io
-from skimage.measure import compare_psnr,compare_ssim
+from skimage.metrics import peak_signal_noise_ratio,structural_similarity
 
 from evaluation import AverageMeter
 import pytorch_ssim as pytorch_ssim
@@ -32,6 +32,9 @@ class BasicModel(object):
         # create model
         print("==> creating model ")
         self.model = nets.__dict__[self.args.nets](args=args)
+        print(self.args.nets)
+        print(self.args)
+        print(self.model)
         print("==> creating model [Finish]")
        
         self.train_loader, self.val_loader = datasets
@@ -165,6 +168,8 @@ class BasicModel(object):
                 target = batches['target'].to(self.device)
                 mask =batches['mask'].to(self.device)
                 
+                print('Findme')
+                print(self.args.input_size)
                 if self.args.hl:
                     feeded = torch.cat([inputs,torch.zeros((1,4,self.args.input_size,self.args.input_size)).to(self.device)],dim=1)
                 else:

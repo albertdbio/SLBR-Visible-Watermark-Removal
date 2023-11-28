@@ -95,7 +95,7 @@ class Options():
         parser.add_argument('--gpu',default=True,type=bool)
         parser.add_argument('--gpu_id',default='0',type=str)
         parser.add_argument('--preprocess',default='resize_crop',type=str)
-        parser.add_argument('--crop_size',default=256,type=int)
+        parser.add_argument('--crop_size',default=1024,type=int)
         parser.add_argument('--no_flip',action='store_true')
         parser.add_argument('--masked',default=False,type=bool)
         parser.add_argument('--gan-norm', default=False,type=bool, help='train batchsize')

@@ -15,7 +15,7 @@ from options import Options
 import torch.nn.functional as F
 import pytorch_ssim
 from evaluation import compute_IoU, FScore, AverageMeter, compute_RMSE, normPRED
-from skimage.measure import compare_ssim as ssim
+from skimage.metrics import structural_similarity as ssim
 import time
 
 
@@ -51,7 +51,7 @@ def save_output(inputs, preds, save_dir, img_fn, extra_infos=None,  verbose=Fals
     mask_preds = [tensor2np(m, isMask=True)[0] for m in mask_preds]
     main_mask = mask_preds[-2]
     mask_pred = mask_preds[0]
-    outs = [image, bg_gt, bg_pred, mask_gt, mask_pred] #, main_mask]
+    outs = [bg_pred] #, main_mask]
     outimg = np.concatenate(outs, axis=1)
 	
     if verbose==True:
@@ -99,9 +99,10 @@ def main(args):
     processTime = AverageMeter()
 
     prediction_dir = os.path.join(args.checkpoint,'rst')
+    print("==> save prediction to {}".format(prediction_dir))
     if not os.path.exists(prediction_dir): os.makedirs(prediction_dir)
     
-    save_flag = False
+    save_flag = True
     with torch.no_grad():
         for i, batches in enumerate(model.val_loader):
 
@@ -110,6 +111,7 @@ def main(args):
             mask =batches['mask'].to(model.device)
             wm =  batches['wm'].float().to(model.device)
             img_path = batches['img_path']
+            print(img_path[0])
 
             # select the outputs by the giving arch
             start_time = time.time()
@@ -167,6 +169,8 @@ def main(args):
                     extra_infos={"psnr":psnrx, "rmsew":rmsewx, "f1":f1},
                     verbose=False
                 )
+            if i == 1:
+                break
             if i % 100 == 0:
                 print("Batch[%d/%d]| PSNR:%.4f | SSIM:%.4f | RMSE:%.4f | RMSEw:%.4f | primeIoU:%.4f, primeF1:%.4f | maskIoU:%.4f | maskF1:%.4f | time:%.2f"
                 %(i,len(model.val_loader),psnresx.avg,ssimesx.avg, rmses.avg, rmsews.avg, prime_maskIoU.avg, prime_maskF1.avg, maskIoU.avg, maskF1.avg, processTime.avg))
