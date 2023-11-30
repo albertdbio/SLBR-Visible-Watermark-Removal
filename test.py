@@ -119,7 +119,7 @@ def main(args):
     with torch.no_grad():
         for i, batches in enumerate(model.val_loader):
             inputs = batches["image"].to(model.device)
-            target = batches["target"].to(model.device)
+            target: torch.Tensor = batches["target"].to(model.device)
             mask = batches["mask"].to(model.device)
             wm = batches["wm"].float().to(model.device)
             img_path = batches["img_path"]
@@ -132,11 +132,15 @@ def main(args):
             processTime.update((process_time * 1000), inputs.size(0))
 
             imoutput, immask_all, imwatermark = outputs
-            imoutput = imoutput[0] if is_dic(imoutput) else imoutput
+            imoutput: torch.Tensor = imoutput[0] if is_dic(imoutput) else imoutput
 
-            immask = immask_all[0]
+            # Get first mask out of the 7 generated
+            immask: torch.Tensor = immask_all[0]
 
-            imfinal = imoutput * immask + model.norm(inputs) * (1 - immask)
+            imfinal: torch.Tensor = imoutput * immask + model.norm(inputs) * (
+                1 - immask
+            )
+
             psnrx = 10 * log10(1 / F.mse_loss(imfinal, target).item())
             final_np = (
                 imfinal.detach().cpu().numpy()[0].transpose(1, 2, 0) * 255

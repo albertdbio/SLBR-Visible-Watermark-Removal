@@ -60,26 +60,44 @@ class CLWDDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.ids)
 
+    # Used for debugging
+    def generate_image(self, dimmension):
+        # create a random tensor of 256 x 256 x 3
+        image = np.random.randint(0, 255, (dimmension, dimmension, 3), dtype=np.uint8)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        return image
+
+    # Used for debugging
+    def generate_mask(self, dimmension):
+        mask = np.random.randint(0, 255, (dimmension, dimmension), dtype=np.uint8)
+        return mask
+
     def get_sample(self, index):
+        # Square dimension of the image to be generated
+        DIM = 256 * 2
+
+        # Print the image id, which is the filename without the extension
         img_id = self.ids[index]
         print(img_id)
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
-        img_J = cv2.imread(self.imageJ_path % img_id)
-        img_J = cv2.cvtColor(img_J, cv2.COLOR_BGR2RGB)
 
-        img_I = cv2.imread(self.imageI_path % img_id)
-        img_I = cv2.cvtColor(img_I, cv2.COLOR_BGR2RGB)
+        # img_J = cv2.imread(self.imageJ_path%img_id)
+        img_J = self.generate_image(DIM)
 
-        w = cv2.imread(self.W_path % img_id)
+        # img_I = cv2.imread(self.imageI_path%img_id)        
+        img_I = self.generate_image(DIM)
+
+        # w = cv2.imread(self.W_path%img_id)        
+        w = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
         if w is None:
             print(self.W_path % img_id)
         w = cv2.cvtColor(w, cv2.COLOR_BGR2RGB)
 
-        mask = cv2.imread(self.mask_path % img_id)
-        alpha = cv2.imread(self.alpha_path % img_id)
+        # mask = cv2.imread(self.mask_path%img_id)        
+        mask = self.generate_mask(DIM)
 
-        mask = mask[:, :, 0].astype(np.float32) / 255.0
-        alpha = alpha[:, :, 0].astype(np.float32) / 255.0
+        # alpha = cv2.imread(self.alpha_path%img_id)        
+        alpha = self.generate_mask(DIM)
 
         return {
             "J": img_J,
