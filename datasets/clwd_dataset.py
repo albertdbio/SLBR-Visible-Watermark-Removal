@@ -14,12 +14,13 @@ class CLWDDataset(torch.utils.data.Dataset):
     def __init__(self, is_train, args):
         args.is_train = is_train == "train"
         if args.is_train == True:
-            self.root = args.dataset_dir + "/train/"
+            self.root = args.dataset_dir + "/train"
             # self.keep_background_prob = 0.01
             self.keep_background_prob = -1
         elif args.is_train == False:
-            self.root = args.dataset_dir + "/test/"  #'/test/'
+            self.root = args.dataset_dir + "/test"  #'/test/'
             self.keep_background_prob = -1
+            # This overrides the cli arguments
             # args.preprocess = "resize"
             args.no_flip = True
 
