@@ -14,7 +14,7 @@ CUDA_VISIBLE_DEVICES=0 python3  test.py \
   --test-batch 1 \
   --evaluate\
   --dataset_dir /content/SLBR-Visible-Watermark-Removal/Watermark/${DATASET} \
-  --no_flip \
+  --no_flip true \
   --name ${NAME} \
   --mask_mode ${MASK_MODE} \
   --k_center ${K_CENTER} \

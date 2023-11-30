@@ -17,7 +17,7 @@ CUDA_VISIBLE_DEVICES=1 python3  test_custom.py \
   --test-batch 1 \
   --evaluate\
   --preprocess resize \
-  --no_flip \
+  --no_flip true \
   --mask_mode ${MASK_MODE} \
   --k_center ${K_CENTER} \
   --use_refine \
