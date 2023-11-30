@@ -64,8 +64,9 @@ class BaseDataset(data.Dataset, ABC):
 class HCompose(Compose):
     def __init__(self, transforms, *args, additional_targets=None, no_nearest_for_masks=True, **kwargs):
         if additional_targets is None:
-            additional_targets = {
-                'real': 'image',
+            additional_targets = {    
+                # During testing, we don't specify additional targets, thus we will error if trying to access 'real'
+                # 'real': 'image',
                 # 'mask': 'mask'
             }
         self.additional_targets = additional_targets
@@ -107,6 +108,7 @@ def get_transform(opt, params=None, grayscale=False, convert=True, additional_ta
     elif opt.preprocess == 'none':
         return HCompose(transform_list)
 
+    # During training no_flip is False thus we do flip
     if not opt.no_flip:
         if params is None:
             # print("flip")
