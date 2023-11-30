@@ -39,7 +39,8 @@ class BasicModel(object):
         
         self.title = args.name
         self.args.checkpoint = os.path.join(args.checkpoint, self.title)
-        self.device = torch.device('cuda')
+        cuda_available = torch.cuda.is_available()
+        self.device = cuda_available and torch.device("cuda") or torch.device("cpu")
          # create checkpoint dir
         if not isdir(self.args.checkpoint):
             mkdir_p(self.args.checkpoint)
