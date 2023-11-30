@@ -32,9 +32,6 @@ class BasicModel(object):
         # create model
         print("==> creating model ")
         self.model = nets.__dict__[self.args.nets](args=args)
-        print(self.args.nets)
-        print(self.args)
-        print(self.model)
         print("==> creating model [Finish]")
        
         self.train_loader, self.val_loader = datasets
