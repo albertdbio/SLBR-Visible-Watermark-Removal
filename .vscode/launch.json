@@ -16,8 +16,12 @@
         "slbr",
         "--models",
         "slbr",
-        "--input-size",
-        "768",
+        "--preprocess",
+        "none",
+        "--input_heigth",
+        "614",
+        "--input_width",
+        "460"
       ],
       "console": "integratedTerminal",
       "justMyCode": true

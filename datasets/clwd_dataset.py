@@ -20,7 +20,7 @@ class CLWDDataset(torch.utils.data.Dataset):
         elif args.is_train == False:
             self.root = args.dataset_dir + "/test/"  #'/test/'
             self.keep_background_prob = -1
-            args.preprocess = "resize"
+            # args.preprocess = "resize"
             args.no_flip = True
 
         self.args = args
@@ -61,20 +61,21 @@ class CLWDDataset(torch.utils.data.Dataset):
         return len(self.ids)
 
     # Used for debugging
-    def generate_image(self, dimmension):
+    def generate_image(self, height, width):
         # create a random tensor of 256 x 256 x 3
-        image = np.random.randint(0, 255, (dimmension, dimmension, 3), dtype=np.uint8)
+        image = np.random.randint(0, 255, (height, width, 3), dtype=np.uint8)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return image
 
     # Used for debugging
-    def generate_mask(self, dimmension):
-        mask = np.random.randint(0, 255, (dimmension, dimmension), dtype=np.uint8)
+    def generate_mask(self, height, width):
+        mask = np.random.randint(0, 255, (height, width), dtype=np.uint8)
         return mask
 
     def get_sample(self, index):
-        # Square dimension of the image to be generated
-        DIM = 256 * 2
+        # Get the input_height and input_width from the args
+        input_height = self.args.input_heigth
+        input_width = self.args.input_width
 
         # Print the image id, which is the filename without the extension
         img_id = self.ids[index]
@@ -82,10 +83,10 @@ class CLWDDataset(torch.utils.data.Dataset):
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
 
         # img_J = cv2.imread(self.imageJ_path%img_id)
-        img_J = self.generate_image(DIM)
+        img_J = self.generate_image(input_height, input_width)
 
         # img_I = cv2.imread(self.imageI_path%img_id)        
-        img_I = self.generate_image(DIM)
+        img_I = self.generate_image(input_height, input_width)
 
         # w = cv2.imread(self.W_path%img_id)        
         w = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
@@ -94,10 +95,10 @@ class CLWDDataset(torch.utils.data.Dataset):
         w = cv2.cvtColor(w, cv2.COLOR_BGR2RGB)
 
         # mask = cv2.imread(self.mask_path%img_id)        
-        mask = self.generate_mask(DIM)
+        mask = self.generate_mask(input_height, input_width)
 
         # alpha = cv2.imread(self.alpha_path%img_id)        
-        alpha = self.generate_mask(DIM)
+        alpha = self.generate_mask(input_height, input_width)
 
         return {
             "J": img_J,
