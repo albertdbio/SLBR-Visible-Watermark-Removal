@@ -166,7 +166,6 @@ class BasicModel(object):
                 target = batches['target'].to(self.device)
                 mask =batches['mask'].to(self.device)
                 
-                print('Findme')
                 print(self.args.input_size)
                 if self.args.hl:
                     feeded = torch.cat([inputs,torch.zeros((1,4,self.args.input_size,self.args.input_size)).to(self.device)],dim=1)
