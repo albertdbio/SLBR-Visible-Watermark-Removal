@@ -75,7 +75,7 @@ class CLWDDataset(torch.utils.data.Dataset):
 
     def get_sample(self, index):
         # Get the input_height and input_width from the args
-        input_height = self.args.input_heigth
+        input_height = self.args.input_height
         input_width = self.args.input_width
 
         # Print the image id, which is the filename without the extension

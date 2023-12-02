@@ -18,9 +18,9 @@
         "slbr",
         "--preprocess",
         "none",
-        "--input_heigth",
-        "614",
         "--input_width",
+        "614",
+        "--input_height",
         "460"
       ],
       "console": "integratedTerminal",

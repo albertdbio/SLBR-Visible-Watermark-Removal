@@ -84,8 +84,8 @@ class Options():
                             help='show intermediate results')
         # parser.add_argument('--input-size', default=256, type=int, metavar='N',
         #                     help='train batchsize')
-        parser.add_argument('--input_heigth', default=614, type=int, metavar='N',
-                            help='Heigth of input image')
+        parser.add_argument('--input_height', default=614, type=int, metavar='N',
+                            help='Height of input image')
         parser.add_argument('--input_width', default=460, type=int, metavar='N',
                             help='Width of input image')
         parser.add_argument('--freq', default=-1, type=int, metavar='N',
