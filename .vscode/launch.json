@@ -21,7 +21,16 @@
         "--input_width",
         "614",
         "--input_height",
-        "460"
+        "460",
+        "--mask_mode",
+        "res",
+        "--k_center",
+        "2",
+        "--k_refine",
+        "3",
+        "--k_skip",
+        "3",
+        "--use_refine"
       ],
       "console": "integratedTerminal",
       "justMyCode": true
