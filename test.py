@@ -17,6 +17,7 @@ import pytorch_ssim
 from evaluation import compute_IoU, FScore, AverageMeter, compute_RMSE, normPRED
 from skimage.metrics import structural_similarity as ssim
 import time
+from src.utils import trimTensor, trimNPArray
 
 
 def is_dic(x):
@@ -53,7 +54,13 @@ def save_output(
     mask_preds = [tensor2np(m, isMask=True)[0] for m in mask_preds]
     main_mask = mask_preds[-2]
     mask_pred = mask_preds[0]
-    outs = [bg_pred]  # , main_mask]
+
+    # Custom Changes:
+    # Stage : Save Final Output
+    # main_mask will be padded so we need to trim it
+    main_mask = trimNPArray(main_mask, mask_gt.shape)
+
+    outs = [bg_pred]#, main_mask]
     outimg = np.concatenate(outs, axis=1)
 
     if verbose == True:
@@ -170,6 +177,12 @@ def main(args):
             mask_pred = torch.where(
                 comp_mask > 0.5, torch.ones_like(out_mask), torch.zeros_like(out_mask)
             ).to(out_mask.device)
+
+            # Custom Changes:
+            # Stage : Statistics
+            # The predicted mask will be padded so we need to trim it
+            mask_pred = trimTensor(mask_pred, mask.shape)
+            prime_mask_pred = trimTensor(prime_mask_pred, mask.shape)
 
             iou = compute_IoU(prime_mask_pred, mask)
             prime_maskIoU.update(iou)

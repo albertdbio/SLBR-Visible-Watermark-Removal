@@ -14,6 +14,7 @@ from src.networks.blocks import (
 import scipy.stats as st
 import itertools
 import cv2
+from ..utils import trimTensor
 
 
 def weight_init(m):
@@ -66,6 +67,19 @@ class CoarseEncoder(nn.Module):
         encoder_outs = []
         for d_conv in self.down_convs:
             x, before_pool = d_conv(x)
+            # Custom Changes:
+            # Stage: 1. CoarseEncoder -> DownConv
+            # We will check if any of the height or width dimensions are odd
+            # If so, we will pad that dimension with one more pixel
+            if x.shape[2] % 2 != 0:
+                x = F.pad(x, (0, 0, 0, 1))
+            if x.shape[3] % 2 != 0:
+                x = F.pad(x, (0, 1, 0, 0))
+            if before_pool.shape[2] % 2 != 0:
+                before_pool = F.pad(before_pool, (0, 0, 0, 1))
+            if before_pool.shape[3] % 2 != 0:
+                before_pool = F.pad(before_pool, (0, 1, 0, 0))
+
             encoder_outs.append(before_pool)
         return x, encoder_outs
 
@@ -343,8 +357,14 @@ class Refinement(nn.Module):
         xin = torch.cat([coarse_bg, mask], dim=1)
         x = self.conv_in(xin)
 
+        # Custom Changes:
+        # Stage 5. Refinement -> DownConv
+        # Trim the decoder features to match the size of the coarse decoder features
+        dec_feat2 = trimTensor(dec_feat2, x.shape)
         x, d1 = self.down1(x + dec_feat2)  # 128,256
+        dec_feat3 = trimTensor(dec_feat3, x.shape)
         x, d2 = self.down2(x + dec_feat3)  # 64,128
+        dec_feat4 = trimTensor(dec_feat4, x.shape)
         x, d3 = self.down3(x + dec_feat4)  # 32,64
 
         xs = [d1, d2, d3]
@@ -352,7 +372,8 @@ class Refinement(nn.Module):
             xs = block(xs)
 
         xs = [
-            F.interpolate(x_hr, size=coarse_bg.shape[2:][::-1], mode="bilinear")
+            # Note that we remove [::-1] from the original code
+            F.interpolate(x_hr, size=coarse_bg.shape[2:], mode="bilinear")
             for x_hr in xs
         ]
         im = self.out_conv(torch.cat(xs, dim=1))
@@ -484,20 +505,33 @@ class SLBR(nn.Module):
         return
 
     def forward(self, synthesized):
-        image_code, before_pool = self.encoder(synthesized)
+        image_code, before_pool = self.encoder(synthesized) # Stage: 1. CoarseEncoder
         unshared_before_pool = before_pool  # [: - self.shared]
 
-        im, mask = self.shared_decoder(image_code)
-        ims, mask, wm = self.coarse_decoder(im, None, mask, unshared_before_pool)
+        im, mask = self.shared_decoder(image_code)  # Stage: 2. SharedDecoder
+        ims, mask, wm = self.coarse_decoder(im, None, mask, unshared_before_pool) # Stage: 3. CoarseDecoder
         im = ims[0]
         reconstructed_image = torch.tanh(im)
         if self.long_skip:
-            reconstructed_image = (reconstructed_image + synthesized).clamp(0, 1)
+            # Custom Changes:
+            # Stage: 3. Transition
+            # Since in the down convolutions we may be padding each side of the image and in the up convolutions
+            # we double the size of the image, the reconstructed image may be larger than the synthesized/input image
+            # We will trim the reconstructed image to match the synthesized/input image
+            cropped_reconstructed_image = trimTensor(reconstructed_image, synthesized.shape)
+            reconstructed_image = (cropped_reconstructed_image + synthesized).clamp(0, 1)
 
         reconstructed_mask = mask[0]
         reconstructed_wm = wm
 
         if self.refinement is not None:
+            # Custom Changes:
+            # Stage: 4. Refinement
+            # The reconstructed mask may be larger than the synthesized image        
+            reconstructed_mask = trimTensor(reconstructed_mask, synthesized.shape)
+            # Replace the mask with the reconstructed mask
+            mask[0] = reconstructed_mask
+
             dec_feats = (ims)[1:][::-1]
             coarser = (
                 reconstructed_image * reconstructed_mask
