@@ -135,42 +135,18 @@ class UpConv(nn.Module):
 
     def forward(self, from_up, from_down, mask=None, se=None):
         # Custom Changes:
-        # Stage 2: SharedDecoder -> UpConv
+        # Stage 2: SharedDecoder - UpConv
         # from_up should be half the size of from_down, when we first enter the shared_decoder stage since
         # from_up is the output of the last encoder and from_down is the output of the second to last encoder
         # However, if we applied padding to the coarse encoders to make the dimensions even before pooling, and then
         # we up-convole from_up, which doubles the dimensions, then from_up will be 2 pixels larger than from_down                
-        # thus we need to pad, from_down by 1 pixel on each side or 2 pixels total
+        # thus we need to pad from_down by 1 pixel on each side or 2 pixels total
         
-        # Get the width and height dimensions of from_down
-        down_height, down_width  = from_down.shape[2:]
         # Calculate the height and width of from_up after it is doubled
         up_height, up_width = from_up.shape[2:]
         upsampled_height, upsampled_width = up_height * 2, up_width * 2
-
         # Pad from_down if the dimensions do not match
-        # padded_from_down = padTensor(from_down, upsampled_height, upsampled_width, mode="replicate")
-
-        # Pad from_down if the dimensions do not match
-        padded_from_down = from_down
-        # Check if the height dimensions match
-        if down_height != upsampled_height:
-            # If not, calculate the difference and pad from_down by that amount on one side
-            difference = upsampled_height - down_height
-            # Ensure it is positive and even
-            assert difference >= 0 and difference % 2 == 0
-            padded_from_down = F.pad(
-                padded_from_down, (0, 0, difference//2, difference//2), mode="replicate"
-            )
-        # Check if the width dimensions match
-        if down_width != upsampled_width:
-            # If not, calculate the difference and pad from_down by that amount on one side
-            difference = upsampled_width - down_width
-            # Ensure it is positive and even
-            assert difference >= 0 and difference % 2 == 0            
-            padded_from_down = F.pad(
-                padded_from_down, (difference//2, difference//2, 0, 0), mode="replicate"
-            )
+        padded_from_down = padTensor(from_down, upsampled_height, upsampled_width, mode="replicate")
 
         from_up = self.act(self.norm0(self.up_conv(from_up)))
         if self.concat:
@@ -329,33 +305,14 @@ class MBEBlock(nn.Module):
         self.act = act
 
     def forward(self, from_up, from_down, mask=None):
-        # Get the width and height dimensions of from_down
-        down_height, down_width  = from_down.shape[2:]
+        # Custom Changes:
+        # Stage 3: CoarseDecoder - MBEBlock
         # Get the width and height dimensions of from_up
         up_height, up_width = from_up.shape[2:]
         # Calculate the upsampled width and height
-        upsampled_height, upsampled_width = up_height * 2, up_width * 2
-        
+        upsampled_height, upsampled_width = up_height * 2, up_width * 2        
         # Pad from_down if the dimensions do not match
-        padded_from_down = from_down
-        # Check if the height dimensions match
-        if down_height != upsampled_height:
-            # If not, calculate the difference and pad from_down by that amount on one side
-            difference = upsampled_height - down_height
-            # Ensure it is positive and even
-            assert difference >= 0 and difference % 2 == 0
-            padded_from_down = F.pad(
-                padded_from_down, (0, 0, difference//2, difference//2), mode="replicate"
-            )
-        # Check if the width dimensions match
-        if down_width != upsampled_width:
-            # If not, calculate the difference and pad from_down by that amount on one side
-            difference = upsampled_width - down_width
-            # Ensure it is positive and even
-            assert difference >= 0 and difference % 2 == 0
-            padded_from_down = F.pad(
-                padded_from_down, (difference//2, difference//2, 0, 0), mode="replicate"
-            )
+        padded_from_down = padTensor(from_down, upsampled_height, upsampled_width, mode="replicate")
 
         from_up = self.act(self.norm0(self.up_conv(from_up)))
         if self.concat:

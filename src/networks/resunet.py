@@ -68,7 +68,7 @@ class CoarseEncoder(nn.Module):
         for d_conv in self.down_convs:
             x, before_pool = d_conv(x)
             # Custom Changes:
-            # Stage: 1. CoarseEncoder -> DownConv
+            # Stage 1: CoarseEncoder - DownConv
             # We will check if any of the height or width dimensions are odd
             # If so, we will pad that dimension with one more pixel
             if x.shape[2] % 2 != 0:
@@ -505,16 +505,16 @@ class SLBR(nn.Module):
         return
 
     def forward(self, synthesized):
-        image_code, before_pool = self.encoder(synthesized) # Stage: 1. CoarseEncoder
+        image_code, before_pool = self.encoder(synthesized) # Stage 1: CoarseEncoder
         unshared_before_pool = before_pool  # [: - self.shared]
 
-        im, mask = self.shared_decoder(image_code)  # Stage: 2. SharedDecoder
-        ims, mask, wm = self.coarse_decoder(im, None, mask, unshared_before_pool) # Stage: 3. CoarseDecoder
+        im, mask = self.shared_decoder(image_code)  # Stage 2: SharedDecoder
+        ims, mask, wm = self.coarse_decoder(im, None, mask, unshared_before_pool) # Stage 3: CoarseDecoder
         im = ims[0]
         reconstructed_image = torch.tanh(im)
         if self.long_skip:
             # Custom Changes:
-            # Stage: 3. Transition
+            # Stage 4: Coarse -> Refinement, Long Skip
             # Since in the down convolutions we may be padding each side of the image and in the up convolutions
             # we double the size of the image, the reconstructed image may be larger than the synthesized/input image
             # We will trim the reconstructed image to match the synthesized/input image
@@ -526,8 +526,9 @@ class SLBR(nn.Module):
 
         if self.refinement is not None:
             # Custom Changes:
-            # Stage: 4. Refinement
-            # The reconstructed mask may be larger than the synthesized image        
+            # Stage 5: Refinement
+            # The reconstructed mask may be larger than the synthesized image
+            # Thus we will trim the reconstructed mask to match the target image
             reconstructed_mask = trimTensor(reconstructed_mask, synthesized.shape)
             # Replace the mask with the reconstructed mask
             mask[0] = reconstructed_mask

@@ -56,7 +56,7 @@ def save_output(
     mask_pred = mask_preds[0]
 
     # Custom Changes:
-    # Stage : Save Final Output
+    # Stage 7: Save Final Output
     # main_mask will be padded so we need to trim it
     main_mask = trimNPArray(main_mask, mask_gt.shape)
 
@@ -179,7 +179,7 @@ def main(args):
             ).to(out_mask.device)
 
             # Custom Changes:
-            # Stage : Statistics
+            # Stage 6: Statistics
             # The predicted mask will be padded so we need to trim it
             mask_pred = trimTensor(mask_pred, mask.shape)
             prime_mask_pred = trimTensor(prime_mask_pred, mask.shape)
