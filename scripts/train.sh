@@ -14,7 +14,7 @@ DATASET=CLWD
 NAME=slbr_v1
 # nohup python -u   main.py \
 CUDA_VISIBLE_DEVICES=0 python -u train.py \
- --epochs 100 \
+ --epochs 75 \
  --schedule 65 \
  --lr 1e-3 \
  --gpu_id 0 \

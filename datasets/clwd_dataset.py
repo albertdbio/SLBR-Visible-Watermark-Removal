@@ -81,26 +81,25 @@ class CLWDDataset(torch.utils.data.Dataset):
 
         # Print the image id, which is the filename without the extension
         img_id = self.ids[index]
-        # print(img_id)
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
 
-        # img_J = cv2.imread(self.imageJ_path%img_id)
-        img_J = self.generate_image(input_height, input_width)
+        img_J = cv2.imread(self.imageJ_path%img_id)
+        # img_J = self.generate_image(input_height, input_width)
 
-        # img_I = cv2.imread(self.imageI_path%img_id)        
-        img_I = self.generate_image(input_height, input_width)
+        img_I = cv2.imread(self.imageI_path%img_id)        
+        # img_I = self.generate_image(input_height, input_width)
 
-        # w = cv2.imread(self.W_path%img_id)        
-        w = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
+        w = cv2.imread(self.W_path%img_id)        
+        # w = np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8)
         if w is None:
             print(self.W_path % img_id)
         w = cv2.cvtColor(w, cv2.COLOR_BGR2RGB)
 
-        # mask = cv2.imread(self.mask_path%img_id)        
-        mask = self.generate_mask(input_height, input_width)
+        mask = cv2.imread(self.mask_path%img_id)        
+        # mask = self.generate_mask(input_height, input_width)
 
-        # alpha = cv2.imread(self.alpha_path%img_id)        
-        alpha = self.generate_mask(input_height, input_width)
+        alpha = cv2.imread(self.alpha_path%img_id)        
+        # alpha = self.generate_mask(input_height, input_width)
 
         return {
             "J": img_J,
