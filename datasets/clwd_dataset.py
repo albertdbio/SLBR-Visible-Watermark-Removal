@@ -53,8 +53,9 @@ class CLWDDataset(torch.utils.data.Dataset):
         self.W_path = osp.join(self.root, "Watermark", "%s.png")
 
         self.ids = list()
-        for file in os.listdir(self.root + "/Watermarked_image"):
-            self.ids.append(file.strip(".jpg"))
+        resolved_path = osp.realpath(self.root + "/Watermarked_image")
+        for file in os.listdir(resolved_path):
+            self.ids.append(file.strip(".jpg"))        
         cv2.setNumThreads(0)
         cv2.ocl.setUseOpenCL(False)
 
@@ -80,7 +81,7 @@ class CLWDDataset(torch.utils.data.Dataset):
 
         # Print the image id, which is the filename without the extension
         img_id = self.ids[index]
-        print(img_id)
+        # print(img_id)
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
 
         # img_J = cv2.imread(self.imageJ_path%img_id)
