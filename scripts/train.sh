@@ -13,13 +13,13 @@ INPUT_SIZE=256
 DATASET=CLWD
 NAME=slbr_v1
 # nohup python -u   main.py \
-CUDA_VISIBLE_DEVICES=1 python -u train.py \
+CUDA_VISIBLE_DEVICES=0 python -u train.py \
  --epochs 100 \
  --schedule 65 \
  --lr 1e-3 \
- --gpu_id 1 \
- --checkpoint /media/sda/Watermark \
- --dataset_dir /media/sda/datasets/Watermark/${DATASET} \
+ --gpu_id 0 \
+ --checkpoint /content/SLBR-Visible-Watermark-Removal/Watermark \
+ --dataset_dir /content/SLBR-Visible-Watermark-Removal/Watermark/CLWD \
  --nets slbr  \
  --sltype vggx \
  --mask_mode ${MASK_MODE} \
@@ -31,7 +31,8 @@ CUDA_VISIBLE_DEVICES=1 python -u train.py \
  --masked True \
  --loss-type hybrid \
  --models slbr \
-  --input-size ${INPUT_SIZE} \
+ --input_width ${INPUT_SIZE} \
+ --input_height ${INPUT_SIZE} \
  --crop_size ${INPUT_SIZE} \
  --train-batch 8 \
  --test-batch 1 \
@@ -42,5 +43,5 @@ CUDA_VISIBLE_DEVICES=1 python -u train.py \
  --use_refine \
  --k_refine ${K_REFINE} \
  --k_skip_stage ${K_SKIP} \
-#  --start-epoch 70 \
-#  --resume /media/sda/Watermark/${NAME}/model_best.pth.tar
+ --start-epoch 70 \
+ --resume /content/SLBR-Visible-Watermark-Removal/Watermark/slbr_v1/model_best.pth.tar \

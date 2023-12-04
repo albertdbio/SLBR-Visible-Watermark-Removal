@@ -82,8 +82,8 @@ class Options():
                             help='preception loss')
         parser.add_argument('-d', '--debug', dest='debug', action='store_true',
                             help='show intermediate results')
-        # parser.add_argument('--input-size', default=256, type=int, metavar='N',
-        #                     help='train batchsize')
+        parser.add_argument('--input-size', default=256, type=int, metavar='N',
+                            help='train batchsize')
         parser.add_argument('--input_height', default=614, type=int, metavar='N',
                             help='Height of input image')
         parser.add_argument('--input_width', default=460, type=int, metavar='N',

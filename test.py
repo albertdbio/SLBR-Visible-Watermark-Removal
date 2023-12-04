@@ -203,8 +203,6 @@ def main(args):
                     extra_infos={"psnr": psnrx, "rmsew": rmsewx, "f1": f1},
                     verbose=False,
                 )
-            if i == 1:
-                break
             if i % 100 == 0:
                 print(
                     "Batch[%d/%d]| PSNR:%.4f | SSIM:%.4f | RMSE:%.4f | RMSEw:%.4f | primeIoU:%.4f, primeF1:%.4f | maskIoU:%.4f | maskF1:%.4f | time:%.2f"
