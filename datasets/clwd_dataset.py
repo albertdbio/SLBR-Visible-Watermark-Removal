@@ -76,17 +76,19 @@ class CLWDDataset(torch.utils.data.Dataset):
 
     def get_sample(self, index):
         # Get the input_height and input_width from the args
-        input_height = self.args.input_height
-        input_width = self.args.input_width
+        # input_height = self.args.input_height
+        # input_width = self.args.input_width
 
         # Print the image id, which is the filename without the extension
         img_id = self.ids[index]
         # img_id = self.corrupt_list[index % len(self.corrupt_list)].split('.')[0]
 
         img_J = cv2.imread(self.imageJ_path%img_id)
+        img_J = cv2.cvtColor(img_J, cv2.COLOR_BGR2RGB)
         # img_J = self.generate_image(input_height, input_width)
 
-        img_I = cv2.imread(self.imageI_path%img_id)        
+        img_I = cv2.imread(self.imageI_path%img_id)    
+        img_I = cv2.cvtColor(img_I, cv2.COLOR_BGR2RGB)    
         # img_I = self.generate_image(input_height, input_width)
 
         w = cv2.imread(self.W_path%img_id)        
@@ -100,6 +102,9 @@ class CLWDDataset(torch.utils.data.Dataset):
 
         alpha = cv2.imread(self.alpha_path%img_id)        
         # alpha = self.generate_mask(input_height, input_width)
+
+        mask = mask[:, :, 0].astype(np.float32) / 255.
+        alpha = alpha[:, :, 0].astype(np.float32) / 255.
 
         return {
             "J": img_J,
