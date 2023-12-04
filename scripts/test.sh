@@ -3,5 +3,11 @@ CUDA_VISIBLE_DEVICES=0 python3  test.py \
   --nets slbr \
   --models slbr \
   --preprocess none \
-  --input_height 768 \
-  --input_width 768 \
+  --input_width 614 \
+  --input_height 460 \
+  --mask_mode res \
+  --k_center 2 \
+  --k_refine 3 \
+  --k_skip_stage 3 \
+  --use_refine \
+  --resume /media/sda/Watermark/${NAME}/model_best.pth.tar \
